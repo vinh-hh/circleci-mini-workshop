@@ -1,0 +1,37 @@
+version: 2.1
+
+jobs:
+  build:
+    working_directory: ~/holistics
+    docker:
+      - image: cimg/ruby:2.7.4
+    steps:
+      - checkout
+      - restore_cache:
+          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+      - run:
+          command: bundle install 
+      - save_cache:
+          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+  test:
+    working_directory: ~/holistics
+    docker:
+      - image: cimg/ruby:2.7.4
+    steps:
+      - checkout
+      - restore_cache:
+          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+      - run:
+          command: bundle install 
+      - run:
+          command: bundle exec rspec
+
+workflows:
+  exercise1: 
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
