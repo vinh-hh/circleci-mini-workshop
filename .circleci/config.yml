@@ -9,12 +9,12 @@ jobs:
      - checkout
      - run:
         command: bundle install 
-
   test:
     working_directory: ~/holistics
     docker:
       - image: cimg/ruby:2.7.4
     steps:
+      - checkout
       - run:
           command: bundle exec rspec
 
