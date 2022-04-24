@@ -10,12 +10,12 @@ jobs:
      - run:
         command: bundle install 
 
-  # test:
-  #   docker:
-  #     - image: cimg/ruby:2.7.4
-  #   steps:
-  #     - run:
-  #         command: bundle exec rspec 
+  test:
+    docker:
+      - image: cimg/ruby:2.7.4
+    steps:
+      - run:
+          command: bundle exec rspec
 
 workflows:
   exercise1: 
