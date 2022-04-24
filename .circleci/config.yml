@@ -1,12 +1,30 @@
 version: 2.1
 
 jobs:
-  build:
+  test-rubocop:
     working_directory: ~/holistics
     docker:
       - image: cimg/ruby:2.7.4
     steps:
       - checkout
+      - restore_cache:
+          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+      - run:
+          command: bundle install 
+      - save_cache:
+          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - run:
+          command: bundle exec rubocop
+  test:
+    working_directory: ~/holistics
+    docker:
+      - image: cimg/ruby:2.7.4
+    steps:
+      - checkout
+      - restore_cache:
+          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
       - run:
           command: bundle install 
       - run:
@@ -16,3 +34,6 @@ workflows:
   exercise1: 
     jobs:
       - build
+      - test:
+          requires:
+            - build
