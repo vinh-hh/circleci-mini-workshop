@@ -36,4 +36,4 @@ workflows:
       - test-rubocop
       - test-rspec:
           requires:
-            - test-rspec
+            - test-rubocop
