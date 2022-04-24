@@ -21,3 +21,4 @@ workflows:
   exercise1: 
     jobs:
       - build
+      - test
