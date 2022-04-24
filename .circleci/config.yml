@@ -38,7 +38,7 @@ jobs:
           destination: coverage
 
 workflows:
-  exercise3: 
+  exercise4: 
     jobs:
       - test-rubocop
       - test-rspec:
