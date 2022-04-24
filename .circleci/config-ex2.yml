@@ -17,7 +17,7 @@ jobs:
             - vendor/bundle
       - run:
           command: bundle exec rubocop
-  test:
+  test-rspec:
     working_directory: ~/holistics
     docker:
       - image: cimg/ruby:2.7.4
@@ -31,9 +31,9 @@ jobs:
           command: bundle exec rspec
 
 workflows:
-  exercise1: 
+  exercise2: 
     jobs:
-      - build
-      - test:
+      - test-rubocop
+      - test-rspec:
           requires:
-            - build
+            - test-rubocop
