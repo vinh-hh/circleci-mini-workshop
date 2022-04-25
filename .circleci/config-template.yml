@@ -51,6 +51,21 @@ jobs:
             yarn test
 
 workflows:
-  exercise-dynamic: 
+  test-ruby: 
+    when: << pipeline.parameters.run_ruby_test >>
+    jobs:
+      - test-rspec:
+          requires:
+            - test-rubocop
+  test-js: 
+    when: << pipeline.parameters.run_js_test >>
     jobs:
       - test-js
+
+parameters:
+  run_ruby_test:
+    type: boolean
+    default: false
+  run_js_test:
+    type: boolean
+    default: false
