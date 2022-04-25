@@ -1,13 +1,15 @@
 require 'yaml'
 
+current_branch = `git rev-parse --abbrev-ref HEAD`
+
 def checkout(revision)
   `git checkout #{revision}`
 end
 
-head = ENV['CIRCLE_SHA1']
-base_revision = 'master'
+head = ENV['CIRCLE_SHA1'] || current_branch
+base_revision = 'base-js'
 checkout(base_revision)  # Checkout base revision to make sure it is available for comparison
-checkout(head)  # return to head commit
+checkout(head) # return to head commit
 
 base = `git merge-base #{base_revision} #{head}`.force_encoding('utf-8').strip
 
@@ -31,3 +33,7 @@ puts "Comparing #{base}...#{head}"
 changes = `git diff --name-only #{base} #{head}`.force_encoding('utf-8').split("\n")
 
 puts "=============> changes: #{changes.inspect}"
+
+# checkout(current_branch)
+
+
