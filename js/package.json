@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "test": "jest"
+    "test": "yarn node --experimental-vm-modules $(yarn bin jest)"
   },
   "dependencies": {
     "jest": "^27.5.1"
