@@ -1,71 +1,20 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-executors:
-  ruby-274:
-    working_directory: ~/holistics
-    docker:
-      - image: cimg/ruby:2.7.4
-  node:
-    working_directory: ~/holistics
-    docker:
-      - image: cimg/node:14.19.1
-
-commands:
-  bundle_install:
-    steps:
-      - restore_cache:
-          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-      - run:
-          command: bundle install 
-      - save_cache:
-          key: gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
-
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  test-rubocop:
-    executor: ruby-274
+  build:
+    docker:
+      - image: cimg/ruby:3.1.0
     steps:
-      - checkout
-      - bundle_install
-      - run:
-          command: bundle exec rubocop
-  test-rspec:
-    executor: ruby-274
-    steps:
-      - checkout
-      - bundle_install
-      - run:
-          command: bundle exec rspec
-      - store_artifacts:
-          path: coverage
-          destination: coverage
-  test-js:
-    executor: node
-    steps:
-      - checkout
-      - run:
-          command: |
-            cd js
-            yarn
-            yarn test
+      - run: echo "hello world"
 
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  test-ruby: 
-    when: << pipeline.parameters.run_ruby_test >>
+  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - test-rspec:
-          requires:
-            - test-rubocop
-  test-js: 
-    when: << pipeline.parameters.run_js_test >>
-    jobs:
-      - test-js
-
-parameters:
-  run_ruby_test:
-    type: boolean
-    default: false
-  run_js_test:
-    type: boolean
-    default: false
+      - build
