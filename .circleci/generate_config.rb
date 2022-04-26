@@ -32,22 +32,47 @@ puts "Comparing #{base}...#{head}"
 
 changes = `git diff --name-only #{base} #{head}`.force_encoding('utf-8').split("\n")
 
-
-jobs << <<-YAML
-      - test_gem_rspec:
-          name: #{test_gem_job}
-          <<: *default_context
-          gem_name: #{gem_name}
-          gem_type: #{gem_type}
-          executor_name: #{params[:executor] || 'null'}
-          nodejs_utils_version: #{params[:nodejs_utils_version] || 'null'}
-      - test_gem_sorbet:
-          name: #{test_gem_sorbet_job}
-          <<: *default_context
-          gem_name: #{gem_name}
-          gem_type: #{gem_type}
-YAML
-
 puts "=============> changes: #{changes.inspect}"
 
+# jobs << <<-YAML
+#       - test_gem_rspec:
+#           name: #{test_gem_job}
+#           <<: *default_context
+#           gem_name: #{gem_name}
+#           gem_type: #{gem_type}
+#           executor_name: #{params[:executor] || 'null'}
+#           nodejs_utils_version: #{params[:nodejs_utils_version] || 'null'}
+#       - test_gem_sorbet:
+#           name: #{test_gem_sorbet_job}
+#           <<: *default_context
+#           gem_name: #{gem_name}
+#           gem_type: #{gem_type}
+# YAML
 
+run_ruby_test = false
+run_js_test = false
+
+changes.each do |c|
+  if /\.js$/ =~ c
+    run_js_test = true
+  end
+
+  if /\.rb$/ =~ c
+    run_ruby_test = true
+  end
+end
+
+params = <<~YAML
+parameters:
+  run_ruby_test:
+    type: boolean
+    default: #{run_ruby_test}
+  run_js_test:
+    type: boolean
+    default: #{run_js_test}
+YAML
+
+template = File.read(File.join(__dir__, 'config-template.yml'))
+config = [template, params].join("\n")
+
+File.write(File.join(__dir__, 'config-generated.yml'), config)

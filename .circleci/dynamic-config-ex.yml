@@ -15,7 +15,7 @@ jobs:
           command: |
             ruby generate_config.rb
       - continuation/continue:
-          configuration_path: generated_config.yml
+          configuration_path: config-generated.yml
 
 workflows:
   setup:
