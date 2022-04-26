@@ -54,6 +54,7 @@ workflows:
   test-ruby: 
     when: << pipeline.parameters.run_ruby_test >>
     jobs:
+      - test-rubocop
       - test-rspec:
           requires:
             - test-rubocop
