@@ -7,13 +7,13 @@ orbs:
 
 jobs:
   setup:
-    executor: continuation/default
+    executor: cimg/ruby:2.7.4
     steps:
       - checkout
       - run:
           name: Generate config
           command: |
-            ruby generate_config.rb
+            ruby .circleci/generate_config.rb
       - continuation/continue:
           configuration_path: config-generated.yml
 
