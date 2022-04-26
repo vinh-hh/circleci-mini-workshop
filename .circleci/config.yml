@@ -16,7 +16,7 @@ jobs:
           command: |
             ruby .circleci/generate_config.rb
       - continuation/continue:
-          configuration_path: config-generated.yml
+          configuration_path: .circleci/config-generated.yml
 
 workflows:
   setup:
