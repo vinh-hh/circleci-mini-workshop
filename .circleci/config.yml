@@ -7,7 +7,8 @@ orbs:
 
 jobs:
   setup:
-    executor: cimg/ruby:2.7.4
+    docker:
+      - image: cimg/ruby:2.7.4
     steps:
       - checkout
       - run:
