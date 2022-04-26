@@ -32,6 +32,22 @@ puts "Comparing #{base}...#{head}"
 
 changes = `git diff --name-only #{base} #{head}`.force_encoding('utf-8').split("\n")
 
+
+jobs << <<-YAML
+      - test_gem_rspec:
+          name: #{test_gem_job}
+          <<: *default_context
+          gem_name: #{gem_name}
+          gem_type: #{gem_type}
+          executor_name: #{params[:executor] || 'null'}
+          nodejs_utils_version: #{params[:nodejs_utils_version] || 'null'}
+      - test_gem_sorbet:
+          name: #{test_gem_sorbet_job}
+          <<: *default_context
+          gem_name: #{gem_name}
+          gem_type: #{gem_type}
+YAML
+
 puts "=============> changes: #{changes.inspect}"
 
 
