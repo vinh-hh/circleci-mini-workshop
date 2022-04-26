@@ -29,6 +29,7 @@ author: Huy Vu
 
 ## Part 2: Reusability
 - Parameter
+- Steps
 - Dynamic configuration
 
 ---
@@ -223,3 +224,151 @@ https://circleci.com/docs/2.0/env-vars/#order-of-precedence
 ---
 
 # Parameters
+
+- Types: string, boolean, integer, enum, executor, steps, environment
+- Parameters are declared by name under a job, command, or executor
+- Pipeline parameters are defined at the top level of a project configuration. Note: pipeline params can only support a few types
+
+https://circleci.com/docs/2.0/reusing-config/#using-the-parameters-declaration
+
+---
+
+- Define the parameters before using the params
+- Pass parameters explicitly
+
+```yaml
+version: 2.1
+
+jobs:
+   build:
+     parameters:
+       access-key:
+         type: env_var_name
+         default: AWS_ACCESS_KEY
+       secret-key:
+         type: env_var_name
+         default: AWS_SECRET_KEY
+       command:
+         type: string
+     docker:
+       - image: ubuntu:latest
+         auth:
+           username: mydockerhub-user
+           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+     steps:
+       - run: |
+           s3cmd --access_key ${<< parameters.access-key >>} \\
+                 --secret_key ${<< parameters.secret-key >>} \\
+                 << parameters.command >>
+workflows:
+  workflow:
+    jobs:
+      - build:
+          access-key: FOO_BAR
+          secret-key: BIN_BAZ
+          command: ls s3://some/where
+```
+
+---
+
+# Steps
+
+---
+Job `pre-steps`, `post-steps`. Useful for execute steps without modifying the job
+
+https://circleci.com/docs/2.0/reusing-config/#using-pre-and-post-steps
+
+```yaml
+# config.yml
+version: 2.1
+jobs:
+  bar:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          command: echo "building"
+      - run:
+          command: echo "testing"
+workflows:
+  build:
+    jobs:
+      - bar:
+          pre-steps:
+            - run:
+                command: echo "install custom dependency"
+          post-steps:
+            - run:
+                command: echo "upload artifact to s3"
+```
+
+---
+
+Conditional steps: `when`, `unless`
+https://circleci.com/docs/2.0/reusing-config/#defining-conditional-steps
+
+---
+
+# Dynamic Configuration
+Generate the `config.yml` dynamically
+
+---
+**Use case**: only run RSpec when any `.rb` file is modified, or Jest for `.js`
+</br>
+How to do it:
+- Diff the current branch with the base branch to get modified files
+- Generate the CircleCI config based on those changes
+
+https://circleci.com/docs/2.0/dynamic-config/#getting-started-with-dynamic-config-in-circleci
+
+---
+
+https://circleci.com/docs/2.0/configuration-cookbook/?section=examples-and-guides#dynamic-configuration
+
+```yaml
+version: 2.1
+
+# this allows you to use CircleCI's dynamic configuration feature
+setup: true
+
+# the continuation orb is required in order to use dynamic configuration
+orbs:
+  continuation: circleci/continuation@0.1.2
+
+# our defined job, and its steps
+jobs:
+  setup:
+    executor: continuation/default # can also be cimg/ruby
+    steps:
+      - checkout # checkout code
+      - run: # run a command
+          name: Generate config
+          command: |
+            ./generate-config > generated_config.yml
+      - continuation/continue:
+          configuration_path: generated_config.yml # use newly generated config to continue
+
+# our single workflow, that triggers the setup job defined above
+workflows:
+  setup:
+    jobs:
+      - setup
+
+```
+
+---
+
+- We can write our script to generate the config (more control)
+- Or we can use `path-filtering` job of CircleCI to automate that (easy, less control)
+https://circleci.com/docs/2.0/configuration-cookbook/?section=examples-and-guides#configyml
+
+---
+
+## Exercise 5:
+1. Read the `config-template.yml`
+2. Read the `generate_config.rb` and run it
+3. (Optional) `circleci config validate .circleci/config-generated.yml`
+4. Write the `config.yml` using dynamic configuration syntax
+5. Change the `js/foo.js` to trigger only the Jest test job
+
+
