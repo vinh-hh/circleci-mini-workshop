@@ -8,7 +8,7 @@ end
 
 head = ENV['CIRCLE_SHA1'] || current_branch
 base_revision = 'base-js'
-# checkout(base_revision)  # Checkout base revision to make sure it is available for comparison
+checkout(base_revision)  # Checkout base revision to make sure it is available for comparison
 checkout(head) # return to head commit
 
 base = `git merge-base #{base_revision} #{head}`.force_encoding('utf-8').strip
