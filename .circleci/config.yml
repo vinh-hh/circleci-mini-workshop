@@ -2,7 +2,7 @@ version: 2.1
 
 jobs:
   build:
-    working_directory: ~/holistics
+    working_directory: ~/vinhhh/workspace/circle-ci-workshop
     docker:
       - image: cimg/ruby:2.7.4
     steps:
